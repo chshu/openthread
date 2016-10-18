@@ -50,22 +50,24 @@ class ThreadNetif;
 
 namespace MeshCoP {
 
+enum
+{
+    kFlagLocalUpdated   = 1 << 0,
+    kFlagNetworkUpdated = 1 << 1,
+};
+
 class DatasetManager
 {
 public:
     Dataset &GetLocal(void) { return mLocal; }
     Dataset &GetNetwork(void) { return mNetwork; }
 
+    ThreadError RetrieveLocal(void);
+
     ThreadError SendSetRequest(const otOperationalDataset &aDataset, const uint8_t *aTlvs, uint8_t aLength);
     ThreadError SendGetRequest(const uint8_t *aTlvTypes, uint8_t aLength);
 
 protected:
-    enum
-    {
-        kFlagLocalUpdated   = 1 << 0,
-        kFlagNetworkUpdated = 1 << 1,
-    };
-
     DatasetManager(ThreadNetif &aThreadNetif, const Tlv::Type aType, const char *aUriSet, const char *aUriGet);
 
     ThreadError Clear(uint8_t &aFlags);
@@ -162,6 +164,8 @@ public:
 
     void UpdateDelayTimer(void);
 
+    void ResetDelayTimer(uint8_t aFlags);
+
 private:
     static void HandleGet(void *aContext, Coap::Header &aHeader, Message &aMessage,
                           const Ip6::MessageInfo &aMessageInfo);
@@ -174,7 +178,6 @@ private:
     static void HandleTimer(void *aContext);
     void HandleTimer(void);
 
-    void ResetDelayTimer(uint8_t aFlags);
     void UpdateDelayTimer(Dataset &aDataset, uint32_t &aStartTime);
 
     Coap::Resource mResourceGet;

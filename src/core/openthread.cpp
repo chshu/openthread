@@ -50,9 +50,12 @@
 #include <crypto/mbedtls.hpp>
 #include <net/icmp6.hpp>
 #include <net/ip6.hpp>
+#include <platform/flash.h>
+#include <platform/settings.h>
 #include <platform/radio.h>
 #include <platform/random.h>
 #include <platform/misc.h>
+#include <thread/meshcop_dataset_manager.hpp>
 #include <thread/thread_netif.hpp>
 #include <thread/thread_uris.hpp>
 #include <utils/global_address.hpp>
@@ -1036,6 +1039,24 @@ exit:
 }
 
 #endif
+
+void otInit(otInstance *aInstance)
+{
+    otLogInfoApi("otInit\n");
+
+    otPlatFlashInit();
+    otPlatSettingsInit(aInstance);
+
+    if (aInstance->mThreadNetif.GetActiveDataset().RetrieveLocal() == kThreadError_None)
+    {
+        aInstance->mThreadNetif.GetActiveDataset().ApplyConfiguration();
+    }
+
+    if (aInstance->mThreadNetif.GetPendingDataset().RetrieveLocal() == kThreadError_None)
+    {
+        aInstance->mThreadNetif.GetPendingDataset().ResetDelayTimer(MeshCoP::kFlagLocalUpdated);
+    }
+}
 
 ThreadError otSendDiagnosticGet(otInstance *aInstance, const otIp6Address *aDestination, const uint8_t aTlvTypes[],
                                 uint8_t aCount)

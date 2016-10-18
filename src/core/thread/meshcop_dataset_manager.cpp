@@ -57,8 +57,8 @@ namespace MeshCoP {
 
 DatasetManager::DatasetManager(ThreadNetif &aThreadNetif, const Tlv::Type aType, const char *aUriSet,
                                const char *aUriGet):
-    mLocal(aType),
-    mNetwork(aType),
+    mLocal(aThreadNetif.GetInstance(), aType),
+    mNetwork(aThreadNetif.GetInstance(), aType),
     mCoapServer(aThreadNetif.GetCoapServer()),
     mMle(aThreadNetif.GetMle()),
     mNetif(aThreadNetif),
@@ -566,6 +566,11 @@ exit:
     }
 
     return error;
+}
+
+ThreadError DatasetManager::RetrieveLocal(void)
+{
+    return mLocal.Retrieve();
 }
 
 ThreadError DatasetManager::SendGetRequest(const uint8_t *aTlvTypes, const uint8_t aLength)

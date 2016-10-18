@@ -36,10 +36,17 @@
 #define OT_PLATFORM_SETTINGS_H 1
 
 #include <stdint.h>
+#include <openthread-instance.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+enum
+{
+    kKeyActiveDataset = 0x0001,
+    kKeyPendingDataset = 0x0002,
+};
 
 /**
  * Performs any initialization for the settings subsystem, if necessary.

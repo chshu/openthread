@@ -35,13 +35,15 @@
 #include <stdio.h>
 
 #include <common/code_utils.hpp>
+#include <platform/settings.h>
 #include <thread/meshcop_tlvs.hpp>
 #include <thread/meshcop_dataset.hpp>
 
 namespace Thread {
 namespace MeshCoP {
 
-Dataset::Dataset(const Tlv::Type aType) :
+Dataset::Dataset(otInstance *aInstance, const Tlv::Type aType) :
+    mInstance(aInstance),
     mType(aType),
     mLength(0)
 {
@@ -240,6 +242,8 @@ ThreadError Dataset::Set(const Dataset &aDataset)
         Remove(Tlv::kDelayTimer);
     }
 
+    otPlatSettingsSet(mInstance, mType == Tlv::kActiveTimestamp ? kKeyActiveDataset : kKeyPendingDataset, mTlvs, mLength);
+
     return kThreadError_None;
 }
 
@@ -365,6 +369,8 @@ ThreadError Dataset::Set(const otOperationalDataset &aDataset)
         Set(tlv);
     }
 
+    otPlatSettingsSet(mInstance, mType == Tlv::kActiveTimestamp ? kKeyActiveDataset : kKeyPendingDataset, mTlvs, mLength);
+
 exit:
     return error;
 }
@@ -432,6 +438,11 @@ int Dataset::Compare(const Dataset &aCompare) const
     return rval;
 }
 
+ThreadError Dataset::Retrieve(void)
+{
+    return otPlatSettingsGet(mInstance, mType == Tlv::kActiveTimestamp ? kKeyActiveDataset : kKeyPendingDataset, 0, mTlvs, reinterpret_cast<int *>(&mLength));
+}
+
 ThreadError Dataset::Set(const Tlv &aTlv)
 {
     ThreadError error = kThreadError_None;
@@ -455,6 +466,8 @@ ThreadError Dataset::Set(const Tlv &aTlv)
     memcpy(mTlvs + mLength, &aTlv, sizeof(Tlv) + aTlv.GetLength());
     mLength += sizeof(Tlv) + aTlv.GetLength();
 
+    otPlatSettingsSet(mInstance, mType == Tlv::kActiveTimestamp ? kKeyActiveDataset : kKeyPendingDataset, mTlvs, mLength);
+
 exit:
     return error;
 }
@@ -463,6 +476,7 @@ ThreadError Dataset::Set(const Message &aMessage, uint16_t aOffset, uint8_t aLen
 {
     aMessage.Read(aOffset, aLength, mTlvs);
     mLength = aLength;
+    otPlatSettingsSet(mInstance, mType == Tlv::kActiveTimestamp ? kKeyActiveDataset : kKeyPendingDataset, mTlvs, mLength);
     return kThreadError_None;
 }
 

@@ -190,6 +190,16 @@ otInstance *otInstanceInit(void);
 #endif
 
 /**
+ * This function initializes OpenThread stack.
+ *
+ * This function initializes OpenThread network parameters by retrieving them from non-volatile memory, it must be called before attaching.
+ *
+ * @param[in] aInstance A pointer to an OpenThread instance.
+ *
+ */
+void otInit(otInstance *aInstance);
+
+/**
  * This function disables the OpenThread library.
  *
  * Call this function when OpenThread is no longer in use.

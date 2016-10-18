@@ -56,7 +56,7 @@ public:
      * @param[in]  aType      The type of the dataset, active or pending.
      *
      */
-    Dataset(const Tlv::Type aType);
+    Dataset(otInstance *aInstance, const Tlv::Type aType);
 
     /**
      * This method clears the Dataset.
@@ -129,6 +129,15 @@ public:
     int Compare(const Dataset &aCompare) const;
 
     /**
+     * This method retrieves dataset from non-volatile memory.
+     *
+     * @retval kThreadError_None      Successfully retrieve the dataset.
+     * @retval kThreadError_NotFound  There is no dataset stored in non-volatile memory.
+     *
+     */
+    ThreadError Retrieve(void);
+
+    /**
      * This method sets a TLV in the Dataset.
      *
      * @param[in]  aTlv  A reference to the TLV.
@@ -150,6 +159,7 @@ public:
 private:
     void Remove(uint8_t *aStart, uint8_t aLength);
 
+    otInstance *mInstance;
     Tlv::Type  mType;            ///< Active or Pending
     uint8_t    mTlvs[kMaxSize];  ///< The Dataset buffer
     uint8_t    mLength;          ///< The number of valid bytes in @var mTlvs
