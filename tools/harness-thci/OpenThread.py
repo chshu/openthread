@@ -1239,6 +1239,7 @@ class OpenThread(IThci):
             self.setXpanId(self.xpanId)
             self.setNetworkName(self.networkName)
             self.setNetworkKey(self.networkKey)
+            self.setActiveTimestamp(0)
             self.isWhiteListEnabled = False
             self.isBlackListEnabled = False
             self.isActiveCommissioner = False
