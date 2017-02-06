@@ -444,6 +444,7 @@ void Joiner::SendJoinerEntrustResponse(const Coap::Header &aRequestHeader,
     mState = kStateJoined;
 
     otLogInfoArp("Sent Joiner Entrust response");
+    otLogCertMeshCoP("[THCI] direction=send | type=JOIN_ENT_dummy_rsp");
 
 exit:
 
