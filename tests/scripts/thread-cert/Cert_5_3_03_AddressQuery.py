@@ -136,6 +136,8 @@ class Cert_5_3_3_AddressQuery(unittest.TestCase):
         self.nodes[ROUTER3].stop()
         time.sleep(140)
 
+        print (" ------------------   wake %s", self.nodes[ROUTER3].get_state())
+
         for addr in addrs:
             if addr[0:4] != 'fe80':
                 self.assertFalse(self.nodes[ED2].ping(addr))
