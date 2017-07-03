@@ -674,7 +674,6 @@ private:
 
     static void HandleMacTimer(Timer &aTimer);
     void HandleMacTimer(void);
-    static void HandleBeginTransmit(void *aContext);
     static void HandleBeginTransmit(Timer &aTimer);
     void HandleBeginTransmit(void);
     static void HandleReceiveTimer(Timer &aTimer);
@@ -692,9 +691,7 @@ private:
     static Mac &GetOwner(const Context &aContext);
 
     Timer mMacTimer;
-#if !OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_BACKOFF_TIMER
     Timer mBackoffTimer;
-#endif
     Timer mReceiveTimer;
 
     ExtAddress mExtAddress;

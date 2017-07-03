@@ -134,7 +134,6 @@ private:
     Timer                   mTimer;
     TimerReason             mTimerReason;
 
-    static void HandleTimer(void *aContext);
     static void HandleTimer(Timer &aTimer);
     void HandleTimer(void);
 
