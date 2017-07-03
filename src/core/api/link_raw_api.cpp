@@ -270,7 +270,11 @@ LinkRaw::LinkRaw(otInstance &aInstance):
     mTransmitDoneCallback(NULL),
     mEnergyScanDoneCallback(NULL)
 #if OPENTHREAD_LINKRAW_TIMER_REQUIRED
-    , mTimer(aInstance.mIp6.mTimerScheduler, &LinkRaw::HandleTimer, this)
+#if OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER
+    , mTimer(aInstance.mIp6.mUsecTimerScheduler, &LinkRaw::HandleTimer, this)
+#else
+    , mTimer(aInstance.mIp6.mMsecTimerScheduler, &LinkRaw::HandleTimer, this)
+#endif // OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER
     , mTimerReason(kTimerReasonNone)
 #endif // OPENTHREAD_LINKRAW_TIMER_REQUIRED
 #if OPENTHREAD_CONFIG_ENABLE_SOFTWARE_ENERGY_SCAN
@@ -565,11 +569,11 @@ void LinkRaw::StartCsmaBackoff(void)
     otLogDebgPlat(aInstance, "LinkRaw Starting RetransmitTimeout Timer (%d ms)", backoff);
     mTimerReason = kTimerReasonRetransmitTimeout;
 
-#if OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_BACKOFF_TIMER
-    otPlatUsecAlarmStartAt(&mInstance, otPlatUsecAlarmGetNow(), backoff, &HandleTimer, this);
-#else // OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_BACKOFF_TIMER
+#if OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER
+    mTimer.Start(backoff);
+#else // OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER
     mTimer.Start(backoff / 1000UL);
-#endif // OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_BACKOFF_TIMER
+#endif // OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER
 }
 
 #endif // OPENTHREAD_CONFIG_ENABLE_SOFTWARE_RETRANSMIT

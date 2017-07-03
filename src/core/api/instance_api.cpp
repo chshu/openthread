@@ -66,7 +66,7 @@ ot::MeshForwarder &otGetMeshForwarder(void)
 
 ot::TimerScheduler &otGetTimerScheduler(void)
 {
-    return sInstance->mIp6.mTimerScheduler;
+    return sInstance->mIp6.mMsecTimerScheduler;
 }
 
 ot::TaskletScheduler &otGetTaskletScheduler(void)

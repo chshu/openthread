@@ -374,7 +374,10 @@ public:
 
     MessagePool mMessagePool;
     TaskletScheduler mTaskletScheduler;
-    TimerScheduler mTimerScheduler;
+    TimerScheduler mMsecTimerScheduler;
+#if OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER 
+    TimerScheduler mUsecTimerScheduler;
+#endif
 
 private:
     static void HandleSendQueue(Tasklet &aTasklet);
@@ -412,9 +415,9 @@ static inline Ip6 *Ip6FromTaskletScheduler(TaskletScheduler *aTaskletScheduler)
     return (Ip6 *)CONTAINING_RECORD(aTaskletScheduler, Ip6, mTaskletScheduler);
 }
 
-static inline Ip6 *Ip6FromTimerScheduler(TimerScheduler *aTimerScheduler)
+static inline Ip6 *Ip6FromMsecTimerScheduler(TimerScheduler *aTimerScheduler)
 {
-    return (Ip6 *)CONTAINING_RECORD(aTimerScheduler, Ip6, mTimerScheduler);
+    return (Ip6 *)CONTAINING_RECORD(aTimerScheduler, Ip6, mMsecTimerScheduler);
 }
 
 /**

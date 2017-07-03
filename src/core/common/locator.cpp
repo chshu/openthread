@@ -56,7 +56,7 @@ otInstance *MeshForwarderLocator::GetInstance(void) const
 
 otInstance *TimerSchedulerLocator::GetInstance(void) const
 {
-    return otInstanceFromIp6(Ip6::Ip6FromTimerScheduler(&GetTimerScheduler()));
+    return otInstanceFromIp6(Ip6::Ip6FromMsecTimerScheduler(&GetTimerScheduler()));
 }
 
 otInstance *TaskletSchedulerLocator::GetInstance(void) const

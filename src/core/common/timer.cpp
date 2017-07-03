@@ -47,7 +47,8 @@
 
 namespace ot {
 
-TimerScheduler::TimerScheduler(void):
+TimerScheduler::TimerScheduler(TimerType aType):
+    mType(aType),
     mHead(NULL)
 {
 }
@@ -69,7 +70,7 @@ void TimerScheduler::Add(Timer &aTimer)
 
         for (cur = mHead; cur; cur = cur->mNext)
         {
-            if (aTimer.DoesFireBefore(*cur))
+            if (aTimer.DoesFireBefore(*cur, GetNow()))
             {
                 if (prev)
                 {
@@ -128,23 +129,50 @@ void TimerScheduler::SetAlarm(void)
 {
     if (mHead == NULL)
     {
-        otPlatAlarmStop(GetIp6()->GetInstance());
+#if OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER
+        if (mType == kTimerUsec)
+        {
+            otPlatUsecAlarmStop(GetIp6()->GetInstance());
+        }
+        else
+#endif
+        {
+            otPlatAlarmStop(GetIp6()->GetInstance());
+        }
     }
     else
     {
-        uint32_t now = otPlatAlarmGetNow();
+        uint32_t now = GetNow();
         uint32_t remaining = IsStrictlyBefore(now, mHead->mFireTime) ? (mHead->mFireTime - now) : 0;
 
-        otPlatAlarmStartAt(GetIp6()->GetInstance(), now, remaining);
+#if OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER
+        if (mType == kTimerUsec)
+        {
+            otPlatUsecAlarmStartAt(GetIp6()->GetInstance(), now, remaining);
+        }
+        else
+#endif
+        {
+            otPlatAlarmStartAt(GetIp6()->GetInstance(), now, remaining);
+        }
     }
 }
 
 extern "C" void otPlatAlarmFired(otInstance *aInstance)
 {
     otLogFuncEntry();
-    aInstance->mIp6.mTimerScheduler.ProcessTimers();
+    aInstance->mIp6.mMsecTimerScheduler.ProcessTimers();
     otLogFuncExit();
 }
+
+#if OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER
+extern "C" void otPlatUsecAlarmFired(otInstance *aInstance)
+{
+    otLogFuncEntry();
+    aInstance->mIp6.mUsecTimerScheduler.ProcessTimers();
+    otLogFuncExit();
+}
+#endif
 
 void TimerScheduler::ProcessTimers(void)
 {
@@ -152,7 +180,7 @@ void TimerScheduler::ProcessTimers(void)
 
     if (timer)
     {
-        if (!IsStrictlyBefore(otPlatAlarmGetNow(), timer->mFireTime))
+        if (!IsStrictlyBefore(GetNow(), timer->mFireTime))
         {
             Remove(*timer);
             timer->Fired();
@@ -170,7 +198,7 @@ void TimerScheduler::ProcessTimers(void)
 
 Ip6::Ip6 *TimerScheduler::GetIp6(void)
 {
-    return Ip6::Ip6FromTimerScheduler(this);
+    return Ip6::Ip6FromMsecTimerScheduler(this);
 }
 
 bool TimerScheduler::IsStrictlyBefore(uint32_t aTimeA, uint32_t aTimeB)
@@ -185,14 +213,13 @@ bool TimerScheduler::IsStrictlyBefore(uint32_t aTimeA, uint32_t aTimeB)
     return ((diff & (1UL << 31)) != 0);
 }
 
-bool Timer::DoesFireBefore(const Timer &aSecondTimer)
+bool Timer::DoesFireBefore(const Timer &aSecondTimer, uint32_t aNow)
 {
     bool retval;
-    uint32_t now = GetNow();
-    bool isBeforeNow = TimerScheduler::IsStrictlyBefore(GetFireTime(), now);
+    bool isBeforeNow = TimerScheduler::IsStrictlyBefore(GetFireTime(), aNow);
 
     // Check if one timer is before `now` and the other one is not.
-    if (TimerScheduler::IsStrictlyBefore(aSecondTimer.GetFireTime(), now) != isBeforeNow)
+    if (TimerScheduler::IsStrictlyBefore(aSecondTimer.GetFireTime(), aNow) != isBeforeNow)
     {
         // One timer is before `now` and the other one is not, so if this timer's fire time is before `now` then
         // the second fire time would be after `now` and this timer would fire before the second timer.

@@ -692,9 +692,7 @@ private:
     static Mac &GetOwner(const Context &aContext);
 
     Timer mMacTimer;
-#if !OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_BACKOFF_TIMER
     Timer mBackoffTimer;
-#endif
     Timer mReceiveTimer;
 
     ExtAddress mExtAddress;

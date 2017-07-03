@@ -71,8 +71,8 @@ Mle::Mle(ThreadNetif &aThreadNetif) :
     mAssignLinkMargin(0),
     mParentRequestState(kParentIdle),
     mReattachState(kReattachStop),
-    mParentRequestTimer(aThreadNetif.GetIp6().mTimerScheduler, &Mle::HandleParentRequestTimer, this),
-    mDelayedResponseTimer(aThreadNetif.GetIp6().mTimerScheduler, &Mle::HandleDelayedResponseTimer, this),
+    mParentRequestTimer(aThreadNetif.GetIp6().mMsecTimerScheduler, &Mle::HandleParentRequestTimer, this),
+    mDelayedResponseTimer(aThreadNetif.GetIp6().mMsecTimerScheduler, &Mle::HandleDelayedResponseTimer, this),
     mLastPartitionRouterIdSequence(0),
     mLastPartitionId(0),
     mParentLeaderCost(0),
@@ -1461,7 +1461,7 @@ void Mle::HandleDelayedResponseTimer(Timer &aTimer)
 void Mle::HandleDelayedResponseTimer(void)
 {
     DelayedResponseHeader delayedResponse;
-    uint32_t now = otPlatAlarmGetNow();
+    uint32_t now = Timer::GetNow();
     uint32_t nextDelay = 0xffffffff;
     Message *message = mDelayedResponses.GetHead();
     Message *nextMessage = NULL;
@@ -1988,7 +1988,7 @@ otError Mle::AddDelayedResponse(Message &aMessage, const Ip6::Address &aDestinat
 {
     otError error = OT_ERROR_NONE;
     uint32_t alarmFireTime;
-    uint32_t sendTime = otPlatAlarmGetNow() + aDelay;
+    uint32_t sendTime = Timer::GetNow() + aDelay;
 
     // Append the message with DelayedRespnoseHeader and add to the list.
     DelayedResponseHeader delayedResponse(sendTime, aDestination);

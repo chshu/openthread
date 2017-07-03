@@ -52,7 +52,7 @@ namespace Coap {
 Coap::Coap(ThreadNetif &aNetif):
     ThreadNetifLocator(aNetif),
     mSocket(aNetif.GetIp6().mUdp),
-    mRetransmissionTimer(aNetif.GetIp6().mTimerScheduler, &Coap::HandleRetransmissionTimer, this),
+    mRetransmissionTimer(aNetif.GetIp6().mMsecTimerScheduler, &Coap::HandleRetransmissionTimer, this),
     mResources(NULL),
     mContext(NULL),
     mInterceptor(NULL),
@@ -305,7 +305,7 @@ void Coap::HandleRetransmissionTimer(Timer &aTimer)
 
 void Coap::HandleRetransmissionTimer(void)
 {
-    uint32_t now = otPlatAlarmGetNow();
+    uint32_t now = Timer::GetNow();
     uint32_t nextDelta = 0xffffffff;
     CoapMetadata coapMetadata;
     Message *message = mPendingRequests.GetHead();
@@ -761,7 +761,7 @@ CoapMetadata::CoapMetadata(bool aConfirmable, const Ip6::MessageInfo &aMessageIn
 }
 
 ResponsesQueue::ResponsesQueue(ThreadNetif &aNetif):
-    mTimer(aNetif.GetIp6().mTimerScheduler, &ResponsesQueue::HandleTimer, this)
+    mTimer(aNetif.GetIp6().mMsecTimerScheduler, &ResponsesQueue::HandleTimer, this)
 {
 }
 

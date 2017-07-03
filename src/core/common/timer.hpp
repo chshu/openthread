@@ -39,6 +39,7 @@
 
 #include <openthread/types.h>
 #include <openthread/platform/alarm.h>
+#include <openthread/platform/usec-alarm.h>
 
 #include "common/context.hpp"
 #include "common/debug.hpp"
@@ -61,6 +62,12 @@ class Timer;
  *
  */
 
+enum TimerType
+{
+    kTimerMsec, // millisecond timer scheduler
+    kTimerUsec, // microsecond timer scheduler
+};
+
 /**
  * This class implements the timer scheduler.
  *
@@ -73,8 +80,10 @@ public:
     /**
      * This constructor initializes the object.
      *
+     * @param[in]  aType  The timer scheduler type.
+     *
      */
-    TimerScheduler(void);
+    TimerScheduler(TimerType aType);
 
     /**
      * This method adds a timer instance to the timer scheduler.
@@ -97,6 +106,45 @@ public:
      *
      */
     void ProcessTimers(void);
+
+    /**
+     * This method returns the timer scheduler type.
+     *
+     * @returns The timer scheduler type.
+     *
+     */
+    TimerType GetType(void) { return mType; }
+
+    /**
+     * This method returns the current time.
+     *
+     * @returns The current time (may in milliseconds or microseconds which depends on the timer type).
+     *
+     */
+    uint32_t GetNow() { return GetNow(mType); }
+
+    /**
+     * This static method returns the current time.
+     *
+     * @param[in]  aType  The timer type.
+     *
+     * @returns The current time in milliseconds.
+     *
+     */
+    static uint32_t GetNow(TimerType aType) {
+        (void)aType;
+
+#if OPENTHREAD_CONFIG_ENABLE_PLATFORM_USEC_TIMER
+        if (aType == kTimerUsec)
+        {
+            return otPlatUsecAlarmGetNow();
+        }
+        else
+#endif
+        {
+            return otPlatAlarmGetNow();
+        }
+    }
 
 private:
     /**
@@ -128,7 +176,8 @@ private:
      */
     static bool IsStrictlyBefore(uint32_t aTimeA, uint32_t aTimeB);
 
-    Timer *mHead;
+    TimerType  mType;
+    Timer     *mHead;
 };
 
 /**
@@ -194,7 +243,7 @@ public:
      *                  (aDt must be smaller than or equal to kMaxDt).
      *
      */
-    void Start(uint32_t aDt) { StartAt(GetNow(), aDt); }
+    void Start(uint32_t aDt) { StartAt(GetTimerScheduler().GetNow(), aDt); }
 
     /**
      * This method schedules the timer to fire at @p aDt milliseconds from @p aT0.
@@ -245,12 +294,13 @@ private:
      * This method indicates if the fire time of this timer is strictly before the fire time of a second given timer.
      *
      * @param[in]  aTimer   A reference to the second timer object.
+     * @param[in]  aNow     The current time (may in milliseconds or microseconds which depends on the timer type).
      *
      * @retval TRUE  If the fire time of this timer object is strictly before aTimer's fire time
      * @retval FALSE If the fire time of this timer object is the same or after aTimer's fire time.
      *
      */
-    bool DoesFireBefore(const Timer &aTimer);
+    bool DoesFireBefore(const Timer &aTimer, uint32_t aNow);
 
     void Fired(void) { mHandler(*this); }
 
