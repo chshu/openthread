@@ -57,6 +57,7 @@
 
 #include <openthread-core-config.h>
 #include <openthread/config.h>
+#include "common/logging.hpp"
 
 // clang-format off
 
@@ -707,6 +708,7 @@ void nrf_802154_received_raw(uint8_t *p_data, int8_t power, uint8_t lqi)
         receivedFrame->mInfo.mRxInfo.mUsec = timestamp - receivedFrame->mInfo.mRxInfo.mMsec * US_PER_MS;
     }
 #if OPENTHREAD_CONFIG_ENABLE_TIME_SYNC
+    otLogCritMac(sInstance, "%d %d", otPlatAlarmMicroGetNow(), time);
     // Get the timestamp when the SFD was received.
     uint32_t offset =
         (int32_t)otPlatAlarmMicroGetNow() - (int32_t)nrf_802154_first_symbol_timestamp_get(time, p_data[0]);
