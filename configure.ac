@@ -444,7 +444,7 @@ AM_CONDITIONAL([OPENTHREAD_ENABLE_BUILTIN_MBEDTLS], [test "${enable_builtin_mbed
 
 AC_MSG_CHECKING([whether to build POSIX applicaton])
 AC_ARG_ENABLE(posix-app,
-    [AS_HELP_STRING([--enable-posix-app], [Build POSIX application @<:@default=no@:>@.])],
+    [AS_HELP_STRING([--enable-posix-app], [Build POSIX application @<:@default=yes@:>@.])],
     [
         case "${enableval}" in
 
@@ -457,7 +457,7 @@ AC_ARG_ENABLE(posix-app,
             ;;
         esac
     ],
-    [enable_posix_app=no])
+    [enable_posix_app=yes])
 
 if test "$enable_posix_app" = "yes"; then
     OPENTHREAD_ENABLE_POSIX_APP=1
@@ -476,7 +476,7 @@ AC_DEFINE_UNQUOTED([OPENTHREAD_ENABLE_POSIX_APP], [${OPENTHREAD_ENABLE_POSIX_APP
 
 AC_MSG_CHECKING([whether to build FTD library])
 AC_ARG_ENABLE(ftd,
-    [AS_HELP_STRING([--enable-ftd], [Build FTD library @<:@default=no@:>@.])],
+    [AS_HELP_STRING([--enable-ftd], [Build FTD library @<:@default=yes@:>@.])],
     [
         case "${enableval}" in
 
@@ -489,7 +489,7 @@ AC_ARG_ENABLE(ftd,
             ;;
         esac
     ],
-    [enable_ftd=no])
+    [enable_ftd=yes])
 
 if test "$enable_ftd" = "yes"; then
     OPENTHREAD_ENABLE_FTD=1
@@ -572,7 +572,7 @@ AC_DEFINE_UNQUOTED([OPENTHREAD_ENABLE_RADIO_ONLY], [${OPENTHREAD_ENABLE_RADIO_ON
 
 AC_MSG_CHECKING([whether to build CLI library])
 AC_ARG_ENABLE(cli,
-    [AS_HELP_STRING([--enable-cli], [Build CLI library @<:@default=no@:>@.])],
+    [AS_HELP_STRING([--enable-cli], [Build CLI library @<:@default=yes@:>@.])],
     [
         case "${enableval}" in
 
@@ -585,7 +585,7 @@ AC_ARG_ENABLE(cli,
             ;;
         esac
     ],
-    [enable_cli=no])
+    [enable_cli=yes])
 
 if test "$enable_cli" = "yes"; then
     OPENTHREAD_ENABLE_CLI=1
@@ -604,7 +604,7 @@ AC_DEFINE_UNQUOTED([OPENTHREAD_ENABLE_CLI], [${OPENTHREAD_ENABLE_CLI}], [Define 
 
 AC_MSG_CHECKING([whether to build NCP library])
 AC_ARG_ENABLE(ncp,
-    [AS_HELP_STRING([--enable-ncp], [Build NCP library @<:@default=no@:>@.])],
+    [AS_HELP_STRING([--enable-ncp], [Build NCP library @<:@default=yes@:>@.])],
     [
         case "${enableval}" in
 
@@ -617,7 +617,7 @@ AC_ARG_ENABLE(ncp,
             ;;
         esac
     ],
-    [enable_ncp=no])
+    [enable_ncp=yes])
 
 if test "$enable_ncp" = "yes"; then
     OPENTHREAD_ENABLE_NCP=1
@@ -636,7 +636,7 @@ AC_DEFINE_UNQUOTED([OPENTHREAD_ENABLE_NCP], [${OPENTHREAD_ENABLE_NCP}], [Define 
 
 AC_ARG_WITH(
     [ncp-bus],
-    [AS_HELP_STRING([--with-ncp-bus],[Specify the NCP bus (none|spi|uart) @<:@default=none@:>@.])],
+    [AS_HELP_STRING([--with-ncp-bus],[Specify the NCP bus (none|spi|uart) @<:@default=uart@:>@.])],
     [
         case "${with_ncp_bus}" in
         "none")
@@ -658,7 +658,7 @@ AC_ARG_WITH(
     ],
     [
        OPENTHREAD_ENABLE_NCP_SPI=0
-       OPENTHREAD_ENABLE_NCP_UART=0
+       OPENTHREAD_ENABLE_NCP_UART=1
     ])
 
 AC_SUBST(OPENTHREAD_ENABLE_NCP_SPI)
@@ -1040,7 +1040,7 @@ AC_DEFINE_UNQUOTED([OPENTHREAD_ENABLE_MAC_FILTER],[${OPENTHREAD_ENABLE_MAC_FILTE
 #
 
 AC_ARG_ENABLE(diag,
-    [AS_HELP_STRING([--enable-diag],[Enable diagnostics support @<:@default=no@:>@.])],
+    [AS_HELP_STRING([--enable-diag],[Enable diagnostics support @<:@default=yes@:>@.])],
     [
         case "${enableval}" in
 
@@ -1053,7 +1053,7 @@ AC_ARG_ENABLE(diag,
             ;;
         esac
     ],
-    [enable_diag=no])
+    [enable_diag=yes])
 
 if test "$enable_diag" = "yes"; then
     OPENTHREAD_ENABLE_DIAG=1

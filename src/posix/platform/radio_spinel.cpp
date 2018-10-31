@@ -38,12 +38,10 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
-#if OPENTHREAD_CONFIG_POSIX_APP_ENABLE_PTY_DEVICE
 #ifdef OPENTHREAD_TARGET_DARWIN
 #include <util.h>
 #else
 #include <pty.h>
-#endif
 #endif
 #include <stdarg.h>
 #include <stdlib.h>
@@ -246,7 +244,6 @@ static void LogIfFail(const char *aText, otError aError)
     OT_UNUSED_VARIABLE(aError);
 }
 
-#if OPENTHREAD_CONFIG_POSIX_APP_ENABLE_PTY_DEVICE
 static int ForkPty(const char *aCommand, const char *aArguments)
 {
     int fd  = -1;
@@ -309,7 +306,6 @@ static int ForkPty(const char *aCommand, const char *aArguments)
 exit:
     return fd;
 }
-#endif // OPENTHREAD_CONFIG_POSIX_APP_ENABLE_PTY_DEVICE
 
 static int OpenFile(const char *aFile, const char *aConfig)
 {
@@ -533,13 +529,11 @@ void RadioSpinel::Init(const char *aRadioFile, const char *aRadioConfig)
         mSockFd = OpenFile(aRadioFile, aRadioConfig);
         VerifyOrExit(mSockFd != -1, error = OT_ERROR_INVALID_ARGS);
     }
-#if OPENTHREAD_CONFIG_POSIX_APP_ENABLE_PTY_DEVICE
     else if (S_ISREG(st.st_mode))
     {
         mSockFd = ForkPty(aRadioFile, aRadioConfig);
         VerifyOrExit(mSockFd != -1, error = OT_ERROR_INVALID_ARGS);
     }
-#endif // OPENTHREAD_CONFIG_POSIX_APP_ENABLE_PTY_DEVICE
 
     SuccessOrExit(error = SendReset());
     SuccessOrExit(error = WaitResponse());
